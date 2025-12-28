@@ -107,37 +107,41 @@ def filtrar_datos(conexion, filtro, value):
     query = f"SELECT * FROM titanic WHERE {value} = {filtro}"
     data=(listar_datos(conexion, query))
     pd_data=pd.DataFrame(data, columns=['PassengerId', 'Survived', 'Pclass', 'Name', 'Sex', 'Age', 'SibSp', 'Parch', 'Ticket', 'Fare', 'Cabin', 'Embarked'])
-    print(pd_data)
+    #print(pd_data)
     return pd_data
     
 
         
 def main():
     conexion = conectar_mysql()
-    if len(sys.argv) > 1 and sys.argv[1] == 'load':
-        file_path = 'titanic.csv'  # Ruta al archivo CSV
-        data = load_data_from_csv(file_path)
-        load_database(data, conexion)
-    elif len(sys.argv) > 1 and sys.argv[1] == 'list':
-        consulta = "SELECT * FROM titanic"
-        resultados = listar_datos(conexion, consulta)
-        for fila in resultados:
-            print(fila)
-    elif len(sys.argv) > 1 and sys.argv[1] == 'Procesar':
-        estadisticas_datos(conexion)
-    elif len(sys.argv) > 3 and sys.argv[1] == 'Filtrar':
-        filtro = sys.argv[2]
-        value = sys.argv[3]
-        filtrar_datos(conexion, filtro, value)
-        filtro2=filtrar_datos(conexion, filtro, value)
-        auxiliar=filtro2[filtro2[sys.argv[4]]== sys.argv[5]]
-        #print(f"{auxiliar}=filtro2[filtro2['Sex']== {sys.argv[4]}]")
-        print(auxiliar)
+    if conexion:
+        if len(sys.argv) > 1 and sys.argv[1] == 'load':
+            file_path = 'titanic.csv'  # Ruta al archivo CSV
+            data = load_data_from_csv(file_path)
+            load_database(data, conexion)
+        elif len(sys.argv) > 1 and sys.argv[1] == 'list':
+            consulta = "SELECT * FROM titanic"
+            resultados = listar_datos(conexion, consulta)
+            for fila in resultados:
+                print(fila)
+        elif len(sys.argv) > 1 and sys.argv[1] == 'Procesar':
+            estadisticas_datos(conexion)
+        elif len(sys.argv) > 3 and sys.argv[1] == 'Filtrar':
+            filtro = sys.argv[2]
+            value = sys.argv[3]
+            print(filtrar_datos(conexion, filtro, value))
+            filtro2=filtrar_datos(conexion, filtro, value)
+            auxiliar=filtro2[filtro2[sys.argv[4]]== sys.argv[5]]
+            #print(f"{auxiliar}=filtro2[filtro2['Sex']== {sys.argv[4]}]")
+            print(auxiliar['Name'])
+        else:
+            print("Uso: python ConexionMySQL3.py [load|list|Procesar|Filtrar]")
+
+
+        cerrar_conexion(conexion)
+    
     else:
-        print("Uso: python ConexionMySQL3.py [load|list|Procesar|Filtrar]")
-
-
-    cerrar_conexion(conexion)
+        print("No se pudo establecer la conexión a la base de datos.")
           
 if __name__ == "__main__":
     main()
