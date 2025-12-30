@@ -10,7 +10,10 @@ def main():
     filter_data_by_origin_and_cylinders(pd,1,4)
     highest_car(pd,['car_name', 'mpg'])
     highest_car(pd,['car_name', 'displacement'])
-    highest_car(pd,['car_name', 'mpg'])
+    add_column(pd, 'displacement_to_power',0)
+    agrupar_por_origen_y_calcular_media(pd)
+    show_lower_than_percentile(pd, 'mpg', 10)
+    
     
 def listar_datos(pd,q,fl):
     if fl == 'f':
@@ -49,7 +52,27 @@ def highest_car(pd,visual,filtro='mpg'):
     print("Car with the highest MPG:")
     print(car_with_max_mpg[visual])
 
-
+def add_column(pd, new_column_name, default_value=0):
+    pd[new_column_name] = pd['displacement'] /pd['horsepower']
+    max_value = pd[new_column_name].max()
+    car_with_max_value = pd[pd[new_column_name] == max_value]       
+    print(f"Car with the highest {new_column_name}:")
+    print(car_with_max_value[['car_name', new_column_name]])
+    
+def agrupar_por_origen_y_calcular_media(pd):
+    grouped_data = pd.groupby('origin')['mpg'].mean().reset_index().max()
+    print("Media de MPG agrupada por origen:")
+    print(grouped_data)
+    
+def show_lower_than_percentile(pd, column_name, percentile):
+    mpg_10th_percentile = pd['mpg'].quantile(0.10)
+    filtered_mpg = pd[pd['mpg'] > mpg_10th_percentile]
+    threshold = np.percentile(pd[column_name], percentile)
+    filtered_data = pd[pd[column_name] > threshold]
+    print(f"Cars with {column_name} greater than the {percentile}th percentile ({threshold}):")
+    print(filtered_data)
+    print(f"Cars with {column_name} greater than the 10th percentile ({mpg_10th_percentile}):")
+    print(filtered_mpg)
 
 if __name__ == "__main__":
     main()
